@@ -1,5 +1,6 @@
 (function(moment) {
-    var STRINGS = {
+
+    var STRINGS_default = {
         nodiff: '',
         year: 'year',
         years: 'years',
@@ -15,13 +16,43 @@
         seconds: 'seconds',
         delimiter: ' '
     };
+    
+    var STRINGS_ko = {
+      nodiff: '',
+      year: '년',
+      years: '년',
+      month: '개월',
+      months: '개월',
+      day: '일',
+      days: '일',
+      hour: '시간',
+      hours: '시간',
+      minute: '분',
+      minutes: '분',
+      second: '초',
+      seconds: '초',
+      delimiter: ' '  
+    };
+
+
+    var strings = {
+        default : STRINGS_default,
+        ko : STRINGS_ko
+    };
+    
+
+
     moment.fn.preciseDiff = function(d2) {
         return moment.preciseDiff(this, d2);
     };
-    moment.preciseDiff = function(d1, d2) {
+    moment.preciseDiff = function(d1, d2, locale) {
+
+        // set locale 
+        locale = typeof locale !== 'undefined' ?  locale : 'default';
+
         var m1 = moment(d1), m2 = moment(d2);
         if (m1.isSame(m2)) {
-            return STRINGS.nodiff;
+            return strings.default.nodiff;
         }
         if (m1.isAfter(m2)) {
             var tmp = m1;
@@ -63,7 +94,14 @@
         }
 
         function pluralize(num, word) {
-            return num + ' ' + STRINGS[word + (num === 1 ? '' : 's')];
+            if(locale === 'ko') {
+                // Korean - ko
+                return num + ' ' + strings.ko[word + (num === 1 ? '' : 's')];
+            } else { 
+                // default 
+                return num + ' ' + strings.default[word + (num === 1 ? '' : 's')];
+            }
+            
         }
         var result = [];
 
@@ -86,6 +124,14 @@
             result.push(pluralize(secDiff, 'second'));
         }
 
-        return result.join(STRINGS.delimiter);
+        if(locale === 'ko') {
+            // Korean - ko
+            return result.join(strings.ko.delimiter);
+        } else { 
+            // default 
+            return result.join(strings.default.delimiter);
+        }
+
+        
     };
 }(moment));
